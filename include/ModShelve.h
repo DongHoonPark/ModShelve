@@ -9,8 +9,13 @@ class ModShelve
     ~ModShelve();
 
     template <typename T>
-    uint32_t allocate(std::optional<uint32_t> location);
+    std::optional<T*> allocate();
+
+    template <typename T>
+    std::optional<T*> allocate(uint32_t reg_addr);
 
     uint16_t* mb_mem_block;
 
+    private:
+    uint32_t last_alloc_addr;
 };

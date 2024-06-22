@@ -12,7 +12,7 @@ TEST_CASE("Allocate consecutive uint16_t and check for allocation failure on alr
 
     // Allocate 10 consecutive uint16_t
     bool allAllocated = true;
-    for (uint32_t i = 0; i < 10; ++i) {
+    for (uint32_t i = 0; i < 10; i++) {
         auto result = shelve.allocate<uint16_t>(i);
         if (!result.has_value()) {
             allAllocated = false;
@@ -35,10 +35,23 @@ TEST_CASE("Allocate uint16_t consecutively and then a float32_t with proper addr
     shelve.allocate<uint16_t>(1);
     shelve.allocate<uint16_t>(2);
 
-    // Now allocate a float32_t
-    auto floatResult = shelve.allocate<float>(3);
-    REQUIRE_FALSE(floatResult.has_value()); // Should fail because 3 is not a multiple of 4
+    auto floatResultAligned = shelve.allocate<float>(3);
 
-    auto floatResultAligned = shelve.allocate<float>(4);
-    REQUIRE(floatResultAligned.has_value()); // Should succeed and allocate at the next multiple of 4
+    REQUIRE_FALSE(floatResultAligned == std::nullopt);
+    if(floatResultAligned != std::nullopt)
+    {
+        REQUIRE(floatResultAligned.value() == reinterpret_cast<float*>(regs + 4));
+    }
+}
+
+TEST_CASE("Allocate several allocation by automatic manner", "[ModShelve]") {
+    uint16_t regs[100];
+    auto shelve = ModShelve(regs, 100);
+
+    for(auto i=0; i< 10; i++)
+    {
+        shelve.allocate<uint16_t>();
+    }
+
+
 }

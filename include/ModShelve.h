@@ -50,7 +50,7 @@ std::optional<T*> ModShelve::allocate(uint32_t reg_addr) {
     }
 
     // Check if the requested memory fits within the allocated block
-    if (reg_addr + reg_size_needed > this->reg_size || reg_addr % 2 != 0)
+    if (reg_addr + reg_size_needed > this->reg_size || !allocateRange(reg_addr, reg_addr + reg_size_needed - 1))
         return std::nullopt; // Return empty optional if out of bounds or misaligned
 
     T* allocated_addr = reinterpret_cast<T*>(&this->mb_mem_block[reg_addr]);
